@@ -63,6 +63,12 @@ shared_examples_for "the friendship model" do
       @friendship.blocked?.should be_false
     end
 
+    it "should not allow any sharing by default" do
+      @friendship.shares_passages.should be_false
+      @friendship.shares_trainings.should be_false
+      @friendship.shares_calendars.should be_false
+    end
+
     it "should be available to block by both users" do
       @friendship.can_block?(@jane).should be_true
       @friendship.can_block?(@david).should be_true

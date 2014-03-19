@@ -56,19 +56,48 @@ module Amistad
         :source => :friendable,
         :conditions => "friendable_id <> blocker_id"
     end
+    # -------------------------------------------------------------------------
 
-    # suggest a user to become a friend. If the operation succeeds, the method returns true, else false
-    def invite(user)
+
+    # Suggest a user to become a friend. If the operation succeeds, the method returns true, else false.
+    #
+    # The "requestee" friendable can also set the requested sharing attributes which
+    # will then either be confirmed (set to true) or denied (set to false) during the approval process.
+    #
+    def invite(user, shares_passages = false, shares_trainings = false, shares_calendars = false)
       return false if user == self || find_any_friendship_with(user)
-      Amistad.friendship_class.new{ |f| f.friendable = self ; f.friend = user }.save
+      Amistad.friendship_class.new{ |f|
+        f.friendable = self
+        f.friend = user
+        f.shares_passages  = shares_passages
+        f.shares_trainings = shares_trainings
+        f.shares_calendars = shares_calendars
+      }.save
     end
+    # -------------------------------------------------------------------------
 
-    # approve a friendship invitation. If the operation succeeds, the method returns true, else false
-    def approve(user)
+
+    # Approve a friendship invitation. If the operation succeeds, the method returns true, else false.
+    #
+    # The friend approving a friendship request can only set sharing attributes
+    # to true if the "requestee" friendable asked for it, setting them previously
+    # with an invite request.
+    # Otherwise, set the sharing attributes using their dedicated setter methods.
+    # (#set_share_passages_with, #set_share_trainings_with, #set_share_calendar_with)
+    #
+    def approve(user, shares_passages = false, shares_trainings = false, shares_calendars = false)
       friendship = find_any_friendship_with(user)
       return false if friendship.nil? || invited?(user)
-      friendship.update_attribute(:pending, false)
+      # To confirm an attribute to true it must be previously set to true during
+      # the invite request: (to avoid lax-setting of sharing attributes during the approval process)
+      friendship.shares_passages  = friendship.shares_passages  && shares_passages
+      friendship.shares_trainings = friendship.shares_trainings && shares_trainings
+      friendship.shares_calendars = friendship.shares_calendars && shares_calendars
+      friendship.pending = false
+      friendship.save
     end
+    # -------------------------------------------------------------------------
+
 
     # deletes a friendship
     def remove_friendship(user)
@@ -78,19 +107,53 @@ module Amistad
       self.reload && user.reload if friendship.destroyed?
     end
 
-    # returns the list of approved friends
-    def friends
-      friendship_model = Amistad::Friendships.const_get(:"#{Amistad.friendship_model}")
+
+    # Override to check for specific Friend-identity equivalence among
+    # different classes that are both including the Friend model.
+    # Only <tt>:id</tt> and <tt>:name</tt> are checked for equivalence.
+    def ==(other_friend)
+      return false unless other_friend.respond_to?(:id) && other_friend.respond_to?(:name)
+      (self.id == other_friend.id) && (self.name == other_friend.name)
+    end
+    # -------------------------------------------------------------------------
+
+
+    # Returns the list of approved friends.
+    #
+    # Set <tt>filter_passage_share</tt>, <tt>filter_training_share</tt> and <tt>filter_calendar_share</tt>
+    # to either +true+ or +false+ (instead of +nil+ = 'do not care') to retrieve only friendship having
+    # the specified sharing attribute values.
+    #
+    def friends( filter_passage_share = nil, filter_training_share = nil, filter_calendar_share = nil )
+      friendship_model = Amistad::Friendships.const_get( :"#{Amistad.friendship_model}" )
 
       approved_friendships = friendship_model.where{
         ( friendable_id == my{id} ) &
         ( pending       == false  ) &
+        (
+          filter_passage_share.nil?  ? true : shares_passages  == filter_passage_share 
+        ) &
+        (
+          filter_training_share.nil? ? true : shares_trainings == filter_training_share 
+        ) &
+        (
+          filter_calendar_share.nil? ? true : shares_calendars == filter_calendar_share 
+        ) &
         ( blocker_id    == nil    )
       }
 
       approved_inverse_friendships = friendship_model.where{
         ( friend_id  == my{id} ) &
         ( pending    == false   ) &
+        (
+          filter_passage_share.nil?  ? true : shares_passages  == filter_passage_share 
+        ) &
+        (
+          filter_training_share.nil? ? true : shares_trainings == filter_training_share 
+        ) &
+        (
+          filter_calendar_share.nil? ? true : shares_calendars == filter_calendar_share 
+        ) &
         ( blocker_id == nil     )
       }
 
@@ -99,6 +162,25 @@ module Amistad
         ( id.in(approved_inverse_friendships.select{friendable_id})  )
       }
     end
+    # -------------------------------------------------------------------------
+
+
+    # Returns the list of approved friends which are also sharing their "Passages"
+    def friends_sharing_passages
+      friends( true )
+    end
+
+    # Returns the list of approved friends which are also sharing their "Trainings"
+    def friends_sharing_trainings
+      friends( nil, true )
+    end
+
+    # Returns the list of approved friends which are also sharing their "Calendars"
+    def friends_sharing_calendars
+      friends( nil, nil, true )
+    end
+    # -------------------------------------------------------------------------
+
 
     # total # of invited and invited_by without association loading
     def total_friends
@@ -118,6 +200,31 @@ module Amistad
       return false if friendship.nil? || !friendship.can_unblock?(self)
       friendship.update_attribute(:blocker, nil)
     end
+    # -------------------------------------------------------------------------
+
+
+    # Toggles sharing of "Passages" for a certain user friend
+    def set_share_passages_with( user, is_enabled = true )
+      friendship = find_any_friendship_with(user)
+      return false if friendship.nil?
+      friendship.update_attribute(:shares_passages, is_enabled)
+    end
+
+    # Toggles sharing of "Trainings" for a certain user friend
+    def set_share_trainings_with( user, is_enabled = true )
+      friendship = find_any_friendship_with(user)
+      return false if friendship.nil?
+      friendship.update_attribute(:shares_trainings, is_enabled)
+    end
+
+    # Toggles sharing of "Calendars" for a certain user friend
+    def set_share_calendar_with( user, is_enabled = true )
+      friendship = find_any_friendship_with(user)
+      return false if friendship.nil?
+      friendship.update_attribute(:shares_calendars, is_enabled)
+    end
+    # -------------------------------------------------------------------------
+
 
     # returns the list of blocked friends
     def blocked
@@ -135,10 +242,48 @@ module Amistad
       blocked.include?(user)
     end
 
+
     # checks if a user is a friend
     def friend_with?(user)
       friends.include?(user)
     end
+    # -------------------------------------------------------------------------
+
+
+    # Checks if this instance is allowing a user to access its "Passages" or vice-versa.
+    # Works both ways (for friend/"acceptee" and friendable/"requestee").
+    # Returns true or false.
+    def is_sharing_passages_with?(user)
+      friendship = find_any_friendship_with(user)
+      return false if friendship.nil?
+      friendship.shares_passages && (
+        (friendship.friend_id == user.id) || (friendship.friendable_id == user.id)
+      )
+    end
+
+    # Checks if this instance is allowing a user to access its "Trainings" or vice-versa.
+    # Works both ways (for friend/"acceptee" and friendable/"requestee").
+    # Returns true or false.
+    def is_sharing_trainings_with?(user)
+      friendship = find_any_friendship_with(user)
+      return false if friendship.nil?
+      friendship.shares_trainings && (
+        (friendship.friend_id == user.id) || (friendship.friendable_id == user.id)
+      )
+    end
+
+    # Checks if this instance is allowing a user to access its "Calendars" or vice-versa.
+    # Works both ways (for friend/"acceptee" and friendable/"requestee").
+    # Returns true or false.
+    def is_sharing_calendars_with?(user)
+      friendship = find_any_friendship_with(user)
+      return false if friendship.nil?
+      friendship.shares_calendars && (
+        (friendship.friend_id == user.id) || (friendship.friendable_id == user.id)
+      )
+    end
+    # -------------------------------------------------------------------------
+
 
     # checks if a current user is connected to given user
     def connected_with?(user)
@@ -159,7 +304,7 @@ module Amistad
       friendship.friend_id == user.id
     end
 
-    # return the list of the ones among its friends which are also friend with the given use
+    # return the list of the ones among its friends which are also friend with the given user
     def common_friends_with(user)
       self.friends & user.friends
     end
