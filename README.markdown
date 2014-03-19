@@ -28,18 +28,17 @@ Customized for Goggles Framework vers. >= 4.00.200
 Usage for quick reference (ActiveRecord only):
 
 	> rails generate amistad:install
-
 	> rake db:migrate
 
 	class User < ActiveRecord::Base  
   	  include Amistad::FriendModel
 	end
 
-Any User requesting a friendship is considered a "friendable".
+Any User requesting a friendship is considered a _"friendable"_.
 
-Any User accepting a friendship is considered a "Friend".
+Any User accepting a friendship is considered a _"friend"_.
 
-Any created and persisted Friendship instance can be blocked by another User and it can have a "pending" status until approved. 
+Any created and persisted Friendship instance can be blocked by another User and it can have a _"pending"_ status until approved. 
 
 
 ### Friendship model added/modified methods
@@ -47,10 +46,8 @@ Any created and persisted Friendship instance can be blocked by another User and
 Additional fields:
 
 	- shares_passages (:default => false, :null => false)
-
 	- shares_trainings (:default => false, :null => false)
-
-	- :shares_calendars (:default => false, :null => false)
+	- shares_calendars (:default => false, :null => false)
 
 
 ### Friend model added/modified methods
@@ -60,7 +57,6 @@ Check out the sources or the generated RDocs for detailed info about the followi
 #### Basic friendship request/response methods:
 
 	- Friend#invite(user, shares_passages = false, shares_trainings = false, shares_calendars = false)
-
 	- Friend#approve(user, shares_passages = false, shares_trainings = false, shares_calendars = false)
 
 #### Altered checker/matcher:
@@ -74,25 +70,19 @@ Check out the sources or the generated RDocs for detailed info about the followi
 #### Returning filtered lists of friends:
 
 	- Friend#friends_sharing_passages
-
 	- Friend#friends_sharing_trainings
-
 	- Friend#friends_sharing_calendars
 
 #### Setters for sharing attributes:
 
 	- Friend#set_share_passages_with( user, is_enabled = true )
-
 	- Friend#set_share_trainings_with( user, is_enabled = true )
-
 	- Friend#set_share_calendar_with( user, is_enabled = true )
 
 #### Bi-directional getters for sharing attributes:
 
 	- Friend#is_sharing_passages_with?(user)
-
 	- Friend#is_sharing_trainings_with?(user)
-
 	- Friend#is_sharing_calendars_with?(user)
 
 
