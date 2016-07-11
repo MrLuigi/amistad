@@ -14,5 +14,5 @@ describe 'Amistad friendship model whith custom friend model' do
     create_users(Profile)
   end
 
-  it_should_behave_like "the friendship model"
+  it_behaves_like "the friendship model"
 end

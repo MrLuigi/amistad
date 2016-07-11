@@ -1,10 +1,10 @@
-shared_examples_for "the friendship model" do  
-  it "should validate presence of the user's id and the friend's id" do
+shared_examples_for "the friendship model" do
+  it "validates the presence of the user's id and the friend's id" do
     friendship = Amistad.friendship_class.new
-    friendship.valid?.should be_false
-    friendship.errors.should include(:friendable_id)
-    friendship.errors.should include(:friend_id)
-    friendship.errors.size.should == 2
+    expect( friendship.valid? ).to be false
+    expect( friendship.errors ).to include(:friendable_id)
+    expect( friendship.errors ).to include(:friend_id)
+    expect( friendship.errors.size ).to eq( 2 )
   end
 
   context "when creating friendship" do
@@ -13,30 +13,30 @@ shared_examples_for "the friendship model" do
       @friendship = Amistad.friendship_class.first
     end
 
-    it "should be pending" do
-      @friendship.pending?.should be_true
+    it "is pending" do
+      expect( @friendship.pending? ).to be true
     end
 
-    it "should not be approved" do
-      @friendship.approved?.should be_false
+    it "isn't approved" do
+      expect( @friendship.approved? ).to be false
     end
 
-    it "should be active" do
-      @friendship.active?.should be_true
+    it "is active" do
+      expect( @friendship.active? ).to be true
     end
 
-    it "should not be blocked" do
-      @friendship.blocked?.should be_false
+    it "isn't blocked" do
+      expect( @friendship.blocked? ).to be false
     end
 
-    it "should be available to block only by invited user" do
-      @friendship.can_block?(@david).should be_true
-      @friendship.can_block?(@jane).should be_false
+    it "is available for blocking only by invited user" do
+      expect( @friendship.can_block?(@david) ).to be true
+      expect( @friendship.can_block?(@jane) ).to be false
     end
 
-    it "should not be available to unblock" do
-      @friendship.can_unblock?(@jane).should be_false
-      @friendship.can_unblock?(@david).should be_false
+    it "isn't available for unblocking" do
+      expect( @friendship.can_unblock?(@jane) ).to be false
+      expect( @friendship.can_unblock?(@david) ).to be false
     end
   end
 
@@ -47,36 +47,36 @@ shared_examples_for "the friendship model" do
       @friendship = Amistad.friendship_class.first
     end
 
-    it "should be approved" do
-      @friendship.approved?.should be_true
+    it "is approved" do
+      expect( @friendship.approved? ).to be true
     end
 
-    it "should not be pending" do
-      @friendship.pending?.should be_false
+    it "isn't pending" do
+      expect( @friendship.pending? ).to be false
     end
 
-    it "should be active" do
-      @friendship.active?.should be_true
+    it "is active" do
+      expect( @friendship.active? ).to be true
     end
 
-    it "should not be blocked" do
-      @friendship.blocked?.should be_false
+    it "isn't blocked" do
+      expect( @friendship.blocked? ).to be false
     end
 
-    it "should not allow any sharing by default" do
-      @friendship.shares_passages.should be_false
-      @friendship.shares_trainings.should be_false
-      @friendship.shares_calendars.should be_false
+    it "doesn't allow any sharing by default" do
+      expect( @friendship.shares_passages ).to be false
+      expect( @friendship.shares_trainings ).to be false
+      expect( @friendship.shares_calendars ).to be false
     end
 
-    it "should be available to block by both users" do
-      @friendship.can_block?(@jane).should be_true
-      @friendship.can_block?(@david).should be_true
+    it "is available for blocking by both users" do
+      expect( @friendship.can_block?(@jane) ).to be true
+      expect( @friendship.can_block?(@david) ).to be true
     end
 
-    it "should not be availabel to unblock" do
-      @friendship.can_unblock?(@jane).should be_false
-      @friendship.can_unblock?(@david).should be_false
+    it "isn't available for unblocking" do
+      expect( @friendship.can_unblock?(@jane) ).to be false
+      expect( @friendship.can_unblock?(@david) ).to be false
     end
   end
 
@@ -87,30 +87,30 @@ shared_examples_for "the friendship model" do
       @friendship = Amistad.friendship_class.first
     end
 
-    it "should not be approved" do
-      @friendship.approved?.should be_false
+    it "isn't approved" do
+      expect( @friendship.approved? ).to be false
     end
 
-    it "should be pending" do
-      @friendship.pending?.should be_true
+    it "is pending" do
+      expect( @friendship.pending? ).to be true
     end
 
-    it "should not be active" do
-      @friendship.active?.should be_false
+    it "isn't active" do
+      expect( @friendship.active? ).to be false
     end
 
-    it "should be blocked" do
-      @friendship.blocked?.should be_true
+    it "is blocked" do
+      expect( @friendship.blocked? ).to be true
     end
 
-    it "should not be available to block" do
-      @friendship.can_block?(@jane).should be_false
-      @friendship.can_block?(@david).should be_false
+    it "isn't available for blocking" do
+      expect( @friendship.can_block?(@jane) ).to be false
+      expect( @friendship.can_block?(@david) ).to be false
     end
 
-    it "should be available to unblock only by user who blocked it" do
-      @friendship.can_unblock?(@david).should be_true
-      @friendship.can_unblock?(@jane).should be_false
+    it "is available for unblocking only by the user who blocked it" do
+      expect( @friendship.can_unblock?(@david) ).to be true
+      expect( @friendship.can_unblock?(@jane) ).to be false
     end
   end
 end

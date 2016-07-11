@@ -9,5 +9,5 @@ describe 'Amistad friendship model' do
     create_users(User)
   end
 
-  it_should_behave_like "the friendship model"
+  it_behaves_like "the friendship model"
 end

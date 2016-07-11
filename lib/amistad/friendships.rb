@@ -6,14 +6,8 @@ module Amistad
         include Amistad::FriendshipModel
         self.table_name = 'friendships'
       end
-    elsif Object.const_defined? :Mongoid
-      Friendship = Class.new
-      Friendship.class_exec do
-        include Mongoid::Document
-        include Amistad::FriendshipModel
-      end
     else
-      raise "Amistad only supports ActiveRecord and Mongoid"
+      raise "Amistad 'version5' only supports ActiveRecord"
     end
   end
 end

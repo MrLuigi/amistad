@@ -20,5 +20,5 @@ RSpec.configure do |config|
 end
 
 # needed in order to be able to compare arrays with ActiveRecord relations
-RSpec::Matchers::OperatorMatcher.register(ActiveRecord::Relation, '=~', RSpec::Matchers::BuiltIn::MatchArray)
+#RSpec::Matchers::OperatorMatcher.register(ActiveRecord::Relation, '=~', RSpec::Matchers::BuiltIn::MatchArray)
 

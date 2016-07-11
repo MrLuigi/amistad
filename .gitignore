@@ -6,5 +6,4 @@ nbproject
 .rvmrc
 .project
 *.sw[a-z]
-.rspec
 database.yml

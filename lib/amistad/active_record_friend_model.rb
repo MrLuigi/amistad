@@ -1,4 +1,4 @@
-require 'squeel'
+#require 'squeel'
 
 module Amistad
   module ActiveRecordFriendModel
@@ -9,52 +9,52 @@ module Amistad
       # friendships
       #####################################################################################
       has_many  :friendships,
-        :class_name => "Amistad::Friendships::#{Amistad.friendship_model}",
-        :foreign_key => "friendable_id"
+        class_name: "Amistad::Friendships::#{ Amistad.friendship_model }",
+        foreign_key: "friendable_id"
 
       has_many  :pending_invited,
-        :through => :friendships,
-        :source => :friend,
-        :conditions => { :'friendships.pending' => true, :'friendships.blocker_id' => nil }
+        through: :friendships,
+        source: :friend,
+        conditions: { :'friendships.pending' => true, :'friendships.blocker_id' => nil }
 
       has_many  :invited,
-        :through => :friendships,
-        :source => :friend,
-        :conditions => { :'friendships.pending' => false, :'friendships.blocker_id' => nil }
+        through: :friendships,
+        source: :friend,
+        conditions: { :'friendships.pending' => false, :'friendships.blocker_id' => nil }
 
       #####################################################################################
       # inverse friendships
       #####################################################################################
       has_many  :inverse_friendships,
-        :class_name => "Amistad::Friendships::#{Amistad.friendship_model}",
-        :foreign_key => "friend_id"
+        class_name: "Amistad::Friendships::#{ Amistad.friendship_model }",
+        foreign_key: "friend_id"
 
       has_many  :pending_invited_by,
-        :through => :inverse_friendships,
-        :source => :friendable,
-        :conditions => { :'friendships.pending' => true, :'friendships.blocker_id' => nil }
+        through: :inverse_friendships,
+        source: :friendable,
+        conditions: { :'friendships.pending' => true, :'friendships.blocker_id' => nil }
 
       has_many  :invited_by,
-        :through => :inverse_friendships,
-        :source => :friendable,
-        :conditions => { :'friendships.pending' => false, :'friendships.blocker_id' => nil }
+        through: :inverse_friendships,
+        source: :friendable,
+        conditions: { :'friendships.pending' => false, :'friendships.blocker_id' => nil }
 
       #####################################################################################
       # blocked friendships
       #####################################################################################
       has_many  :blocked_friendships,
-        :class_name => "Amistad::Friendships::#{Amistad.friendship_model}",
-        :foreign_key => "blocker_id"
+        class_name: "Amistad::Friendships::#{ Amistad.friendship_model }",
+        foreign_key: "blocker_id"
 
       has_many  :blockades,
-        :through => :blocked_friendships,
-        :source => :friend,
-        :conditions => "friend_id <> blocker_id"
+        through: :blocked_friendships,
+        source: :friend,
+        conditions: "friend_id <> blocker_id"
 
       has_many  :blockades_by,
-        :through => :blocked_friendships,
-        :source => :friendable,
-        :conditions => "friendable_id <> blocker_id"
+        through: :blocked_friendships,
+        source: :friendable,
+        conditions: "friendable_id <> blocker_id"
     end
     # -------------------------------------------------------------------------
 
@@ -66,13 +66,16 @@ module Amistad
     #
     def invite(user, shares_passages = false, shares_trainings = false, shares_calendars = false)
       return false if user == self || find_any_friendship_with(user)
-      Amistad.friendship_class.new{ |f|
+      new_invitation = Amistad.friendship_class.new do |f|
         f.friendable = self
         f.friend = user
         f.shares_passages  = shares_passages
         f.shares_trainings = shares_trainings
         f.shares_calendars = shares_calendars
-      }.save
+      end
+# DEBUG
+#      puts "\r\n#{new_invitation.inspect}"
+      new_invitation.save
     end
     # -------------------------------------------------------------------------
 
@@ -127,40 +130,39 @@ module Amistad
     def friends( filter_passage_share = nil, filter_training_share = nil, filter_calendar_share = nil )
       friendship_model = Amistad::Friendships.const_get( :"#{Amistad.friendship_model}" )
 
-      approved_friendships = friendship_model.where{
-        ( friendable_id == my{id} ) &
-        ( pending       == false  ) &
-        (
-          filter_passage_share.nil?  ? true : shares_passages  == filter_passage_share 
-        ) &
-        (
-          filter_training_share.nil? ? true : shares_trainings == filter_training_share 
-        ) &
-        (
-          filter_calendar_share.nil? ? true : shares_calendars == filter_calendar_share 
-        ) &
-        ( blocker_id    == nil    )
-      }
+      where_condition_array = prepare_where_condition_for_shareables(
+        "friendable_id = ? AND pending = ? AND blocker_id IS NULL",
+        filter_passage_share,
+        filter_training_share,
+        filter_calendar_share
+      )
+      approved_friendships = friendship_model.where( where_condition_array )
+# DEBUG
+#      puts "\r\n- approved_friendships...: #{ approved_friendships.map{ |row| row.id }.inspect }"
+#      puts "  for friend_id..............: #{ approved_friendships.map{ |row| row.friend_id }.inspect }"
+#      puts "  for friendable_id..........: #{ approved_friendships.map{ |row| row.friendable_id }.inspect }"
 
-      approved_inverse_friendships = friendship_model.where{
-        ( friend_id  == my{id} ) &
-        ( pending    == false   ) &
-        (
-          filter_passage_share.nil?  ? true : shares_passages  == filter_passage_share 
-        ) &
-        (
-          filter_training_share.nil? ? true : shares_trainings == filter_training_share 
-        ) &
-        (
-          filter_calendar_share.nil? ? true : shares_calendars == filter_calendar_share 
-        ) &
-        ( blocker_id == nil     )
-      }
+      where_condition_array = prepare_where_condition_for_shareables(
+        "friend_id = ? AND pending = ? AND blocker_id IS NULL",
+        filter_passage_share,
+        filter_training_share,
+        filter_calendar_share
+      )
+      approved_inverse_friendships = friendship_model.where( where_condition_array )
+# DEBUG
+#      puts "- approved_inverse_friendships...: #{ approved_inverse_friendships.map{ |row| row.id }.inspect }"
+#      puts "  for friend_id..................: #{ approved_inverse_friendships.map{ |row| row.friend_id }.inspect }"
+#      puts "  for friendable_id..............: #{ approved_inverse_friendships.map{ |row| row.friendable_id }.inspect }"
 
-      self.class.where{
-        ( id.in(approved_friendships.select{friend_id})              ) |
-        ( id.in(approved_inverse_friendships.select{friendable_id})  )
-      }
+      allowed_ids = approved_friendships.select( :friend_id ).map{ |row| row.friend_id }
+      allowed_ids += approved_inverse_friendships.select( :friendable_id ).map{ |row| row.friendable_id }
+# DEBUG
+#      puts "- Allowed IDS: #{ allowed_ids }"
+      if allowed_ids.size > 0
+        self.class.where( ["id IN (?)", allowed_ids] )
+      else # We must return an empty ActiveRecord::Relation:
+        self.class.where( "id = -1" )
+      end
     end
     # -------------------------------------------------------------------------
 
@@ -311,11 +313,38 @@ module Amistad
 
     # returns friendship with given user or nil
     def find_any_friendship_with(user)
-      friendship = Amistad.friendship_class.where(:friendable_id => self.id, :friend_id => user.id).first
+      friendship = Amistad.friendship_class.where(
+        friendable_id: self.id, friend_id: user.id
+      ).first
       if friendship.nil?
-        friendship = Amistad.friendship_class.where(:friendable_id => user.id, :friend_id => self.id).first
+        friendship = Amistad.friendship_class.where(
+          friendable_id: user.id,
+          friend_id: self.id
+        ).first
       end
       friendship
+    end
+
+
+    private
+
+
+    # Returns an ActiveRecord array of conditions, for custom shareables.
+    def prepare_where_condition_for_shareables( where_text, filter_passage_share = nil, filter_training_share = nil, filter_calendar_share = nil )
+      where_values = [ self.id, false ]
+      unless filter_passage_share.nil?
+        where_text   << " AND shares_passages = ?"
+        where_values << filter_passage_share
+      end
+      unless filter_training_share.nil?
+        where_text   << " AND shares_trainings = ?"
+        where_values << filter_training_share
+      end
+      unless filter_calendar_share.nil?
+        where_text   << " AND shares_calendars = ?"
+        where_values << filter_calendar_share
+      end
+      [ where_text ] + where_values
     end
   end
 end

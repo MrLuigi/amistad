@@ -1,3 +1,3 @@
 module Amistad
-  VERSION = "0.9.2"
+  VERSION = "2.0.0"
 end

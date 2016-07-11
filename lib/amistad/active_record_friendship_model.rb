@@ -4,19 +4,19 @@ module Amistad
 
     included do
       belongs_to :friendable,
-        :class_name => Amistad.friend_model,
-        :foreign_key => "friendable_id"
+        class_name:  Amistad.friend_model,
+        foreign_key: "friendable_id"
 
       belongs_to :friend,
-        :class_name => Amistad.friend_model,
-        :foreign_key => "friend_id"
+        class_name:  Amistad.friend_model,
+        foreign_key: "friend_id"
 
       belongs_to :blocker,
-        :class_name => Amistad.friend_model,
-        :foreign_key => "blocker_id"
+        class_name:  Amistad.friend_model,
+        foreign_key: "blocker_id"
 
-      validates_presence_of :friendable_id, :friend_id
-      validates_uniqueness_of :friend_id, :scope => :friendable_id
+      validates_presence_of   :friendable_id, :friend_id
+      validates_uniqueness_of :friend_id, scope: :friendable_id
     end
 
     # returns true if a friendship has been approved, else false

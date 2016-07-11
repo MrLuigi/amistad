@@ -6,7 +6,7 @@ module Amistad
           include Amistad::ActiveRecordFriendshipModel
         end
       else
-        raise "Amistad only supports ActiveRecord and Mongoid"
+        raise "Amistad 'version5' only supports ActiveRecord"
       end
     end
   end
