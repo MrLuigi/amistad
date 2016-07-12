@@ -174,67 +174,67 @@ shared_examples_for "a friend model" do
       expect( @john.invited.to_a ).to eq [@james]
     end
 
-    xit "lists the pending friends who invited him" do
+    it "lists the pending friends who invited him" do
       expect( @john.pending_invited_by.to_a ).to eq [@peter]
     end
 
-    xit "lists the pending friends who were invited by him" do
+    it "lists the pending friends who were invited by him" do
       expect( @john.pending_invited.to_a ).to eq [@jane]
     end
 
-    xit "lists the friends he has in common with another user" do
+    it "lists the friends he has in common with another user" do
       expect( @james.common_friends_with(@mary) ).to eq [@john]
     end
 
-    xit "doesn't list the friends he does not have in common" do
+    it "doesn't list the friends he does not have in common" do
       expect( @john.common_friends_with(@mary).size ).to eq(0)
       expect( @john.common_friends_with(@mary) ).not_to include(@james)
       expect( @john.common_friends_with(@peter).size ).to eq(0)
       expect( @john.common_friends_with(@peter) ).not_to include(@jane)
     end
 
-    xit "checks if a user is a friend" do
+    it "checks if a user is a friend" do
       expect( @john.friend_with?(@mary) ).to be true
       expect( @mary.friend_with?(@john) ).to be true
       expect( @john.friend_with?(@james) ).to be true
       expect( @james.friend_with?(@john) ).to be true
     end
 
-    xit "checks if a user is not a friend" do
+    it "checks if a user is not a friend" do
       expect( @john.friend_with?(@jane) ).to be false
       expect( @jane.friend_with?(@john) ).to be false
       expect( @john.friend_with?(@peter) ).to be false
       expect( @peter.friend_with?(@john) ).to be false
     end
 
-    xit "checks if a user has any connections with another user" do
+    it "checks if a user has any connections with another user" do
       expect( @john.connected_with?(@jane) ).to be true
       expect( @jane.connected_with?(@john) ).to be true
       expect( @john.connected_with?(@peter) ).to be true
       expect( @peter.connected_with?(@john) ).to be true
     end
 
-    xit "checks if a user does not have any connections with another user" do
+    it "checks if a user does not have any connections with another user" do
       expect( @victoria.connected_with?(@john) ).to be false
       expect( @john.connected_with?(@victoria) ).to be false
     end
 
-    xit "checks if a user was invited by another" do
+    it "checks if a user was invited by another" do
       expect( @jane.invited_by?(@john) ).to be true
       expect( @james.invited_by?(@john) ).to be true
     end
 
-    xit "checks if a user was not invited by another" do
+    it "checks if a user was not invited by another" do
       expect( @john.invited_by?(@jane) ).to be false
       expect( @victoria.invited_by?(@john) ).to be false
     end
 
-    xit "checks if a user has invited another user" do
+    it "checks if a user has invited another user" do
       expect( @john.invited?(@jane) ).to be true
       expect( @john.invited?(@james) ).to be true
     end
 
-    xit "checks if a user did not invite another user" do
+    it "checks if a user did not invite another user" do
       expect( @jane.invited?(@john) ).to be false
       expect( @james.invited?(@john) ).to be false
       expect( @john.invited?(@victoria) ).to be false
@@ -257,7 +257,7 @@ shared_examples_for "a friend model" do
       expect( @victoria.invite(@elisabeth) ).to be true
     end
 
-    xit "removes the friends invited by him" do
+    it "removes the friends invited by him" do
       expect( @victoria.friends.size ).to eq( 3 )
       expect( @victoria.friends ).to include(@mary)
       expect( @victoria.invited ).to include(@mary)
@@ -274,7 +274,7 @@ shared_examples_for "a friend model" do
       expect( @mary.invited_by ).not_to include(@victoria)
     end
 
-    xit "removes the friends who invited him" do
+    it "removes the friends who invited him" do
       expect( @victoria.friends.size ).to eq( 3 )
       expect( @victoria.friends ).to include(@james)
       expect( @victoria.invited_by ).to include(@james)
@@ -291,7 +291,7 @@ shared_examples_for "a friend model" do
       expect( @james.invited ).not_to include(@victoria)
     end
 
-    xit "removes the pending friends invited by him" do
+    it "removes the pending friends invited by him" do
       expect( @victoria.pending_invited.size ).to eq( 1 )
       expect( @victoria.pending_invited ).to include(@elisabeth)
       expect( @elisabeth.pending_invited_by.size ).to eq( 1 )
@@ -304,7 +304,7 @@ shared_examples_for "a friend model" do
       expect( @elisabeth.pending_invited_by ).not_to include(@victoria)
     end
 
-    xit "removes the pending friends who invited him" do
+    it "removes the pending friends who invited him" do
       expect( @victoria.pending_invited_by.size ).to eq( 1 )
       expect( @victoria.pending_invited_by ).to include(@peter)
       expect( @peter.pending_invited.size ).to eq( 1 )
@@ -340,34 +340,34 @@ shared_examples_for "a friend model" do
       expect( @james.approve(@victoria) ).to be true
     end
 
-    xit "allows to block author of the invitation by invited user" do
+    it "allows to block author of the invitation by invited user" do
       expect( @john.block(@jane) ).to be true
       expect( @jane.block(@victoria) ).to be true
     end
 
-    xit "doesn't allow to block invited user by invitation author" do
+    it "doesn't allow to block invited user by invitation author" do
       expect( @jane.block(@john) ).to be false
       expect( @victoria.block(@jane) ).to be false
     end
 
-    xit "allows to block approved users on both sides" do
+    it "allows to block approved users on both sides" do
       expect( @james.block(@jane) ).to be true
       expect( @victoria.block(@james) ).to be true
     end
 
-    xit "doesn't allow to block not connected user" do
+    it "doesn't allow to block not connected user" do
       expect( @david.block(@peter) ).to be false
       expect( @peter.block(@david) ).to be false
     end
 
-    xit "doesn't allow to block already blocked user" do
+    it "doesn't allow to block already blocked user" do
       expect( @john.block(@jane) ).to be true
       expect( @john.block(@jane) ).to be false
       expect( @james.block(@jane) ).to be true
       expect( @james.block(@jane) ).to be false
     end
 
-    xit "lists the blocked users" do
+    it "lists the blocked users" do
       expect( @jane.blocked ).to be_empty
       expect( @peter.blocked ).to be_empty
       expect( @james.blocked == [@john] ).to be true
@@ -375,7 +375,7 @@ shared_examples_for "a friend model" do
       expect( @david.blocked ).to include( @john, @victoria )
     end
 
-    xit "doesn't list blocked users in friends" do
+    it "doesn't list blocked users in friends" do
       expect( @james.friends ).to include( @jane, @victoria )
       @james.blocked.each do |user|
         expect( @james.friends ).not_to include(user)
@@ -383,7 +383,7 @@ shared_examples_for "a friend model" do
       end
     end
 
-    xit "doesn't list blocked users in invited" do
+    it "doesn't list blocked users in invited" do
       expect( @victoria.invited == [@james] ).to be true
       @victoria.blocked.each do |user|
         expect( @victoria.invited ).not_to include(user)
@@ -391,7 +391,7 @@ shared_examples_for "a friend model" do
       end
     end
 
-    xit "doesn't list blocked users in invited pending by" do
+    it "doesn't list blocked users in invited pending by" do
       expect( @david.pending_invited_by ).to be_empty
       @david.blocked.each do |user|
         expect( @david.pending_invited_by ).not_to include(user)
@@ -399,7 +399,7 @@ shared_examples_for "a friend model" do
       end
     end
 
-    xit "checks if a user is blocked" do
+    it "checks if a user is blocked" do
       expect( @james.blocked?(@john) ).to be true
       expect( @victoria.blocked?(@mary) ).to be true
       expect( @david.blocked?(@john) ).to be true
@@ -432,45 +432,45 @@ shared_examples_for "a friend model" do
       expect( @james.approve(@victoria) ).to be true
     end
 
-    xit "allows to unblock prevoiusly blocked user" do
+    it "allows to unblock prevoiusly blocked user" do
       expect( @david.unblock(@john) ).to be true
       expect( @elisabeth.unblock(@peter) ).to be true
     end
 
-    xit "doesn't allow to unblock not prevoiusly blocked user" do
+    it "doesn't allow to unblock not prevoiusly blocked user" do
       expect( @john.unblock(@jane) ).to be false
       expect( @james.unblock(@jane) ).to be false
       expect( @victoria.unblock(@jane) ).to be false
       expect( @james.unblock(@victoria) ).to be false
     end
 
-    xit "doesn't allow to unblock blocked user by himself" do
+    it "doesn't allow to unblock blocked user by himself" do
       expect( @john.unblock(@david) ).to be false
       expect( @peter.unblock(@elisabeth) ).to be false
     end
 
-    xit "lists unblocked users in friends" do
+    it "lists unblocked users in friends" do
       expect( @john.friends == [@james] ).to be true
       expect( @mary.friends == [@victoria] ).to be true
       expect( @victoria.friends ).to include( @mary, @james )
       expect( @james.friends ).to include( @john, @jane, @victoria )
     end
 
-    xit "lists unblocked users in invited" do
+    it "lists unblocked users in invited" do
       expect( @john.invited == [@james] ).to be true
-      expect( @mary.invited ).to == [@victoria]
+      expect( @mary.invited ).to eq [@victoria]
     end
 
-    xit "lists unblocked users in invited by" do
+    it "lists unblocked users in invited by" do
       expect( @victoria.invited_by == [@mary] ).to be true
       expect( @james.invited_by ).to include( @john, @jane, @victoria )
     end
 
-    xit "lists unblocked users in pending invited" do
+    it "lists unblocked users in pending invited" do
       expect( @victoria.pending_invited ).to include( @jane, @david )
     end
 
-    xit "lists unblocked users in pending invited by" do
+    it "lists unblocked users in pending invited by" do
       expect( @david.pending_invited_by ).to eq [@victoria]
     end
   end
@@ -493,14 +493,14 @@ shared_examples_for "a friend model" do
       expect( @victoria.block(@mary) ).to be true
     end
 
-    xit "returns the correct count for total_friends" do
+    it "returns the correct count for total_friends" do
       expect( @john.total_friends == 3 ).to be true
       expect( @elisabeth.total_friends == 1 ).to be true
       expect( @james.total_friends == 1 ).to be true
       expect( @victoria.total_friends == 1 ).to be true
     end
 
-    xit "returns the correct count for total_blocked" do
+    it "returns the correct count for total_blocked" do
       expect( @david.total_blocked == 1 ).to be true
       expect( @victoria.total_blocked == 1 ).to be true
     end

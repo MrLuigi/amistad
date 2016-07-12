@@ -15,12 +15,12 @@ module Amistad
       has_many  :pending_invited,
         through: :friendships,
         source: :friend,
-        conditions: { :'friendships.pending' => true, :'friendships.blocker_id' => nil }
+        conditions: ["friendships.pending = ? AND friendships.blocker_id IS NULL", true]
 
       has_many  :invited,
         through: :friendships,
         source: :friend,
-        conditions: { :'friendships.pending' => false, :'friendships.blocker_id' => nil }
+        conditions: ["friendships.pending = ? AND friendships.blocker_id IS NULL", false]
 
       #####################################################################################
       # inverse friendships
@@ -32,12 +32,12 @@ module Amistad
       has_many  :pending_invited_by,
         through: :inverse_friendships,
         source: :friendable,
-        conditions: { :'friendships.pending' => true, :'friendships.blocker_id' => nil }
+        conditions: ["friendships.pending = ? AND friendships.blocker_id IS NULL", true]
 
       has_many  :invited_by,
         through: :inverse_friendships,
         source: :friendable,
-        conditions: { :'friendships.pending' => false, :'friendships.blocker_id' => nil }
+        conditions: ["friendships.pending = ? AND friendships.blocker_id IS NULL", false]
 
       #####################################################################################
       # blocked friendships
@@ -106,8 +106,9 @@ module Amistad
     def remove_friendship(user)
       friendship = find_any_friendship_with(user)
       return false if friendship.nil?
-      friendship.destroy
+      result = friendship.destroy
       self.reload && user.reload if friendship.destroyed?
+      result.destroyed?
     end
 
 

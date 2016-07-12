@@ -2,6 +2,7 @@ require 'active_support/concern'
 require 'active_support/dependencies/autoload'
 require 'amistad/config'
 
+
 module Amistad
   extend ActiveSupport::Autoload
 
