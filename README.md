@@ -1,9 +1,11 @@
 # amistad #
 
-Amistad adds friendships management into a rails 3.0 application. it supports ActiveRecord 3.0.x, Mongoid 3.0.x and MongoMapper 0.12.0.
+Amistad adds friendships management into a rails 3.0 application.
+This version supports *only* ActiveRecord 3.0.x + MySQL as DB driver.
 
-This custom version is based upon the original Amistad vers. 0.9.2 and simply adds 3 sharing boolean flags to the Friendship model (currently, only for ActiveRecord: the MongoDB/MongoMapper implementation is still missing in the current version).
- 
+This custom version is based upon the original Amistad vers. 0.9.2 and simply adds 3 sharing boolean flags to the Friendship model.
+All other originally supported Database drivers where removed to slim out the dependency list.
+
 
 ## Installation
 
@@ -30,7 +32,7 @@ Usage for quick reference (ActiveRecord only):
 	> rails generate amistad:install
 	> rake db:migrate
 
-	class User < ActiveRecord::Base  
+	class User < ActiveRecord::Base
   	  include Amistad::FriendModel
 	end
 
@@ -38,7 +40,7 @@ Any User requesting a friendship is considered a _"friendable"_.
 
 Any User accepting a friendship is considered a _"friend"_.
 
-Any created and persisted Friendship instance can be blocked by another User and it can have a _"pending"_ status until approved. 
+Any created and persisted Friendship instance can be blocked by another User and it can have a _"pending"_ status until approved.
 
 
 ### Friendship model added/modified methods
@@ -128,6 +130,8 @@ The default rake tasks runs the ActiveRecord tests for the three rdbms followed 
 
 * David Czarnecki : block friendships (and many other improvements)
 * Adrian Dulić : unblock friendships (and many other improvements)
+* Stefano Alloro: this customized/butchered version.
+
 
 ## Note on Patches/Pull Requests
 

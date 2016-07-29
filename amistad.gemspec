@@ -19,7 +19,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rspec"
   s.add_development_dependency "activerecord", "3.2.22.2"
   s.add_development_dependency "mysql2", "~> 0.3.11"
-  s.add_development_dependency "pg"
+  # [Steve, 20160729] PostgreSQL support NOT required for Goggles "version5":
+#  s.add_development_dependency "pg"
   s.add_development_dependency "database_cleaner"
   s.add_development_dependency "sqlite3"
   s.add_development_dependency "fuubar"
