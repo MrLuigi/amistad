@@ -8,7 +8,7 @@ def connect_server(type)
 
   ActiveRecord::Base.establish_connection config.merge('database' => (type == 'postgresql' ? 'postgres' : nil))
   ActiveRecord::Base.connection.recreate_database(database)
-  ActiveRecord::Base.establish_connection(config) 
+  ActiveRecord::Base.establish_connection(config)
 end
 
 case ENV['RDBM']
@@ -18,7 +18,7 @@ else
   ActiveRecord::Base.establish_connection db_config('sqlite')
 end
 
-class CreateSchema < ActiveRecord::Migration
+class CreateSchema < ActiveRecord::Migration[5.0]
   def self.up
     create_table :users, :force => true do |t|
       t.string :name, :null => false

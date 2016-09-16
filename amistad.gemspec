@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.authors     = ["Rawane ZOSSOU", "Stefano Alloro"]
   s.email       = ["dev@raw1z.fr", "steve.alloro@gmail.com"]
   s.homepage    = "https://github.com/raw1z/amistad/wiki"
-  s.summary     = %q{Adds customized friendship management into a rails 3.2.22 application}
+  s.summary     = %q{Adds customized friendship management into a rails 5 application}
   s.description = %q{Extends your user model with friendships management methods}
 
   s.rubyforge_project = "amistad"
@@ -17,8 +17,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency "bundler"
   s.add_development_dependency "rake"
   s.add_development_dependency "rspec"
-  s.add_development_dependency "activerecord", "3.2.22.2"
-  s.add_development_dependency "mysql2", "~> 0.3.11"
+  s.add_development_dependency "activerecord", "~> 5"
+  s.add_development_dependency "mysql2" #, "~> 0.3.11"
   # [Steve, 20160729] PostgreSQL support NOT required for Goggles "version5":
 #  s.add_development_dependency "pg"
   s.add_development_dependency "database_cleaner"

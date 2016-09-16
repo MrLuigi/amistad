@@ -5,9 +5,10 @@ describe "The friend model" do
     reload_environment
     User = Class.new(ActiveRecord::Base)
 
-    ActiveSupport.on_load(:active_record) do
-      attr_accessible(nil)
-    end
+    # [Steve, 20160916] No need to protect from mass-assignment each attribute since this is the default for Rails 4+
+#    ActiveSupport.on_load(:active_record) do
+#      attr_accessible(nil)
+#    end
   end
 
   it_behaves_like "friend with parameterized models" do

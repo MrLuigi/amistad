@@ -13,14 +13,14 @@ module Amistad
         foreign_key: "friendable_id"
 
       has_many  :pending_invited,
+        -> { where(["friendships.pending = ? AND friendships.blocker_id IS NULL", true]) },
         through: :friendships,
-        source: :friend,
-        conditions: ["friendships.pending = ? AND friendships.blocker_id IS NULL", true]
+        source: :friend
 
       has_many  :invited,
+        -> { where(["friendships.pending = ? AND friendships.blocker_id IS NULL", false]) },
         through: :friendships,
-        source: :friend,
-        conditions: ["friendships.pending = ? AND friendships.blocker_id IS NULL", false]
+        source: :friend
 
       #####################################################################################
       # inverse friendships
@@ -30,14 +30,14 @@ module Amistad
         foreign_key: "friend_id"
 
       has_many  :pending_invited_by,
+        -> { where(["friendships.pending = ? AND friendships.blocker_id IS NULL", true]) },
         through: :inverse_friendships,
-        source: :friendable,
-        conditions: ["friendships.pending = ? AND friendships.blocker_id IS NULL", true]
+        source: :friendable
 
       has_many  :invited_by,
+        -> { where(["friendships.pending = ? AND friendships.blocker_id IS NULL", false]) },
         through: :inverse_friendships,
-        source: :friendable,
-        conditions: ["friendships.pending = ? AND friendships.blocker_id IS NULL", false]
+        source: :friendable
 
       #####################################################################################
       # blocked friendships
@@ -47,14 +47,14 @@ module Amistad
         foreign_key: "blocker_id"
 
       has_many  :blockades,
+        -> { where("friend_id <> blocker_id") },
         through: :blocked_friendships,
-        source: :friend,
-        conditions: "friend_id <> blocker_id"
+        source: :friend
 
       has_many  :blockades_by,
+        -> { where("friendable_id <> blocker_id") },
         through: :blocked_friendships,
-        source: :friendable,
-        conditions: "friendable_id <> blocker_id"
+        source: :friendable
     end
     # -------------------------------------------------------------------------
 
