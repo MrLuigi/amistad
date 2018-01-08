@@ -187,7 +187,7 @@ module Amistad
 
     # total # of invited and invited_by without association loading
     def total_friends
-      self.invited(false).count + self.invited_by(false).count
+      self.invited.count + self.invited_by.count
     end
 
     # blocks a friendship
@@ -237,7 +237,7 @@ module Amistad
 
     # total # of blockades and blockedes_by without association loading
     def total_blocked
-      self.blockades(false).count + self.blockades_by(false).count
+      self.blockades.count + self.blockades_by.count
     end
 
     # checks if a user is blocked
