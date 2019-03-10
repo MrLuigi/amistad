@@ -69,9 +69,6 @@ module Amistad
       new_invitation = Amistad.friendship_class.new do |f|
         f.friendable = self
         f.friend = user
-        f.shares_passages  = shares_passages
-        f.shares_trainings = shares_trainings
-        f.shares_calendars = shares_calendars
       end
 # DEBUG
 #      puts "\r\n#{new_invitation.inspect}"
@@ -91,11 +88,6 @@ module Amistad
     def approve(user, shares_passages = false, shares_trainings = false, shares_calendars = false)
       friendship = find_any_friendship_with(user)
       return false if friendship.nil? || invited?(user)
-      # To confirm an attribute to true it must be previously set to true during
-      # the invite request: (to avoid lax-setting of sharing attributes during the approval process)
-      friendship.shares_passages  = friendship.shares_passages  && shares_passages
-      friendship.shares_trainings = friendship.shares_trainings && shares_trainings
-      friendship.shares_calendars = friendship.shares_calendars && shares_calendars
       friendship.pending = false
       friendship.save
     end
