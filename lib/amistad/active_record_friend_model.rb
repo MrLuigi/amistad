@@ -103,17 +103,6 @@ module Amistad
       result.destroyed?
     end
 
-
-    # Override to check for specific Friend-identity equivalence among
-    # different classes that are both including the Friend model.
-    # Only <tt>:id</tt> and <tt>:name</tt> are checked for equivalence.
-    def ==(other_friend)
-      return false unless other_friend.respond_to?(:id) && other_friend.respond_to?(:name)
-      (self.id == other_friend.id) && (self.name == other_friend.name)
-    end
-    # -------------------------------------------------------------------------
-
-
     # Returns the list of approved friends.
     #
     # Set <tt>filter_passage_share</tt>, <tt>filter_training_share</tt> and <tt>filter_calendar_share</tt>
